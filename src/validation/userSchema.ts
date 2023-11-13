@@ -3,7 +3,7 @@ import vine from "@vinejs/vine";
 const registerSchema = vine.object({
   username: vine
     .string()
-    // .regex(/^[a-zA-Z0-9\-_.]+$/)
+    .regex(/^[a-z0-9\-_.]+$/)
     .minLength(3)
     .maxLength(32),
   email: vine.string().email(),
@@ -11,4 +11,4 @@ const registerSchema = vine.object({
   password: vine.string().minLength(8).maxLength(32).confirmed(),
 });
 
-export default registerSchema;
+export { registerSchema };
