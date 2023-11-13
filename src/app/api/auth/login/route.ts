@@ -21,7 +21,7 @@ export const POST = async (request: NextRequest) => {
 
     // * If user not found
     if (!user) {
-      return responsePayload(false, "Invalid credentials", 401);
+      return responsePayload(false, 401, "Invalid credentials");
     }
 
     // * Compare password
@@ -32,18 +32,18 @@ export const POST = async (request: NextRequest) => {
 
     // * If password not match
     if (!isPasswordMatch) {
-      return responsePayload(false, "Invalid credentials", 401);
+      return responsePayload(false, 401, "Invalid credentials");
     }
 
-    return responsePayload(true, "Login Successfully", 201, {
+    return responsePayload(true, 201, "Login Successfully", {
       ...user,
       password: undefined,
     });
   } catch (error: any) {
     if (error instanceof errors.E_VALIDATION_ERROR) {
-      return responsePayload(false, `${Object.values(error.messages)[0]}`, 400);
+      return responsePayload(false, 400, `Validation Error`, error.messages);
     }
 
-    return responsePayload(false, "Something went wrong", 500);
+    return responsePayload(false, 500, "Something went wrong");
   }
 };

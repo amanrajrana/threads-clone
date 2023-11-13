@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import vine, { errors } from "@vinejs/vine";
 import { registerSchema } from "@/validation/userSchema";
 import { CustomErrorReporter } from "@/validation/customErrorReporter";
@@ -21,7 +21,9 @@ export const POST = async (request: NextRequest) => {
 
     // * If Username exists return error with status code 409 (conflict)
     if (isUsernameExists) {
-      return responsePayload(false, "Username already taken", 409);
+      return responsePayload(false, 409, "Username already taken", {
+        username: "Choose another username",
+      });
     }
 
     // * Check if Email already exists
@@ -30,7 +32,9 @@ export const POST = async (request: NextRequest) => {
     });
 
     if (isEmailExists) {
-      return responsePayload(false, "Email already exists", 409);
+      return responsePayload(false, 409, "Email already exists", {
+        email: "Account already exists with this email",
+      });
     }
 
     // * Hash password
@@ -42,15 +46,16 @@ export const POST = async (request: NextRequest) => {
       data: payload,
     });
 
-    return responsePayload(true, "User created successfully", 201, {
+    return responsePayload(true, 201, "User created successfully", {
       ...user,
       password: undefined,
     });
   } catch (error: any) {
     if (error instanceof errors.E_VALIDATION_ERROR) {
-      return responsePayload(false, `${Object.values(error.messages)[0]}`, 400);
+      // return responsePayload(false, `${Object.values(error.messages)[0]}`, 400);
+      return responsePayload(false, 400, `Validation Error`, error.messages);
     }
 
-    return responsePayload(false, "Something went wrong", 500);
+    return responsePayload(false, 500, "Something went wrong");
   }
 };
