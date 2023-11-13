@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import vine, { errors } from "@vinejs/vine";
 import { registerSchema } from "@/validation/userSchema";
 import { CustomErrorReporter } from "@/validation/customErrorReporter";
 import bcryct from "bcryptjs";
 import prisma from "@/DB/db.config";
+import { responsePayload } from "@api/responsePayload";
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -52,22 +53,4 @@ export const POST = async (request: NextRequest) => {
 
     return responsePayload(false, "Something went wrong", 500);
   }
-};
-
-const responsePayload = (
-  success: boolean,
-  message: string,
-  status: number,
-  data?: {}
-) => {
-  return NextResponse.json(
-    {
-      success,
-      body: {
-        message,
-        data,
-      },
-    },
-    { status }
-  );
 };
