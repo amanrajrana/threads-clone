@@ -21,7 +21,7 @@ export const POST = async (request: NextRequest) => {
 
     // * If Username exists return error with status code 409 (conflict)
     if (isUsernameExists) {
-      return responsePayload(false, 409, "Username already taken", {
+      return responsePayload(409, "Username already taken", {
         username: "Choose another username",
       });
     }
@@ -32,7 +32,7 @@ export const POST = async (request: NextRequest) => {
     });
 
     if (isEmailExists) {
-      return responsePayload(false, 409, "Email already exists", {
+      return responsePayload(409, "Email already exists", {
         email: "Account already exists with this email",
       });
     }
@@ -46,16 +46,16 @@ export const POST = async (request: NextRequest) => {
       data: payload,
     });
 
-    return responsePayload(true, 201, "User created successfully", {
+    return responsePayload(201, "User created successfully", {
       ...user,
       password: undefined,
     });
   } catch (error: any) {
     if (error instanceof errors.E_VALIDATION_ERROR) {
-      // return responsePayload(false, `${Object.values(error.messages)[0]}`, 400);
-      return responsePayload(false, 400, `Validation Error`, error.messages);
+      // return responsePayload(`${Object.values(error.messages)[0]}`, 400);
+      return responsePayload(400, `Validation Error`, error.messages);
     }
 
-    return responsePayload(false, 500, "Something went wrong");
+    return responsePayload(500, "Something went wrong");
   }
 };
