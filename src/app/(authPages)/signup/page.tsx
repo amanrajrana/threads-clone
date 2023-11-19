@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import React, { useState } from "react";
+import axios from "axios";
 
 export default function SignUp() {
   const [authState, setAuthState] = useState<AuthStateType>({
@@ -15,9 +16,27 @@ export default function SignUp() {
     password_confirmation: "",
   });
 
+  const [errors, setErrors] = useState<AuthStateType>({});
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Handle Submit
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("authState", authState);
+
+    setErrors({});
+    setLoading(true);
+
+    axios
+      .post("/api/auth/register", authState)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        setErrors(err.response.data.body.errors);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -42,6 +61,7 @@ export default function SignUp() {
                   setAuthState({ ...authState, name: e.target.value })
                 }
               />
+              <ErrorSpan>{errors?.name}</ErrorSpan>
             </div>
 
             {/* Username Input Field  */}
@@ -55,6 +75,7 @@ export default function SignUp() {
                   setAuthState({ ...authState, username: e.target.value })
                 }
               />
+              <ErrorSpan>{errors?.username}</ErrorSpan>
             </div>
 
             {/* Email Input Field  */}
@@ -68,6 +89,7 @@ export default function SignUp() {
                   setAuthState({ ...authState, email: e.target.value })
                 }
               />
+              <ErrorSpan>{errors?.email}</ErrorSpan>
             </div>
 
             {/* Password Input Field  */}
@@ -81,6 +103,7 @@ export default function SignUp() {
                   setAuthState({ ...authState, password: e.target.value })
                 }
               />
+              <ErrorSpan>{errors?.password}</ErrorSpan>
             </div>
 
             {/* Confirm Password Input Field  */}
@@ -91,15 +114,18 @@ export default function SignUp() {
                 id="confirmPassword"
                 placeholder="Confirm Password"
                 onChange={(e) =>
-                  setAuthState({ ...authState, password_confirmation: e.target.value })
+                  setAuthState({
+                    ...authState,
+                    password_confirmation: e.target.value,
+                  })
                 }
               />
             </div>
 
             {/* Login Button  */}
             <div className="mt-5">
-              <Button type="submit" className="w-full">
-                Register
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Loading..." : "Register"}
               </Button>
             </div>
           </form>
@@ -118,3 +144,7 @@ export default function SignUp() {
     </div>
   );
 }
+
+const ErrorSpan = ({ children }: { children: React.ReactNode }) => {
+  return <span className="text-red-500 text-sm">{children}</span>;
+};
